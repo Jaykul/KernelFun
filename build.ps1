@@ -1,5 +1,5 @@
 Push-Location $PSScriptRoot
-dotnet publish
+dotnet publish .\Source\KernelFun.csproj
 
 Write-Host "========================================================================================================================"
 Write-Host "You should probably make a new pwsh instance before importing to test:"
