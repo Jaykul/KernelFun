@@ -31,27 +31,27 @@ namespace DotNetInteractivePSCmdlet
         //private readonly Repl repl;
         public InvokeKernelCommand()
         {
-            var pwsh = new PowerShellKernel()
-                                .UseProfiles()
-                                .UseDotNetVariableSharing();
+            // var pwsh = new PowerShellKernel()
+            //                     .UseProfiles()
+            //                     .UseDotNetVariableSharing();
 
             // var csharp = new CSharpKernel()
             //                     .UseNugetDirective()
             //                     .UseKernelHelpers()
             //                     .UseWho();
 
-            var fsharp = new FSharpKernel()
+            var kernel = new FSharpKernel()
                                 .UseDefaultFormatting()
                                 .UseNugetDirective()
                                 .UseKernelHelpers()
                                 .UseWho();
 
-            var kernel = new CompositeKernel {
-                pwsh,
-                //csharp,
-                fsharp,
-            };
-            kernel.DefaultKernelName = pwsh.Name;
+            // var kernel = new CompositeKernel {
+            //     pwsh,
+            //     //csharp,
+            //     fsharp,
+            // };
+            // kernel.DefaultKernelName = pwsh.Name;
             this.kernel = kernel;
 
             Formatter.SetPreferredMimeTypeFor(typeof(object), "text/plain");
@@ -62,15 +62,16 @@ namespace DotNetInteractivePSCmdlet
         {
             base.ProcessRecord();
 
-            var targetCmd = new SubmitCode(InputObject, Kernel);
+            var targetCmd = new SubmitCode(InputObject);
             WriteInformation("RunKernelCommand: " + targetCmd, new []{"PSHOST"});
-            var events = AsyncContext.Run(async () =>
+            var task = Task.Run(async () =>
             {
                 var result = await kernel.SendAsync(targetCmd);
                 var waiter = result.KernelEvents.ToSubscribedList();
                 return waiter;
             });
-            WriteInformation("Got " + events.Count + " events!", new []{"PSHOST"});
+            var events = task.GetAwaiter().GetResult();
+            WriteInformation("Got events!", new []{"PSHOST"});
 
             WriteObject(events.OfType<DisplayEvent>().ToArray());
 
