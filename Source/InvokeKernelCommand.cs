@@ -31,27 +31,27 @@ namespace DotNetInteractivePSCmdlet
         //private readonly Repl repl;
         public InvokeKernelCommand()
         {
-            // var pwsh = new PowerShellKernel()
-            //                     .UseProfiles()
-            //                     .UseDotNetVariableSharing();
+            var pwsh = new PowerShellKernel()
+                                .UseProfiles()
+                                .UseDotNetVariableSharing();
 
-            // var csharp = new CSharpKernel()
-            //                     .UseNugetDirective()
-            //                     .UseKernelHelpers()
-            //                     .UseWho();
+            //var csharp = new CSharpKernel()
+            //                    .UseNugetDirective()
+            //                    .UseKernelHelpers()
+            //                    .UseWho();
 
-            var kernel = new FSharpKernel()
+            var fsharp = new FSharpKernel()
                                 .UseDefaultFormatting()
                                 .UseNugetDirective()
                                 .UseKernelHelpers()
                                 .UseWho();
 
-            // var kernel = new CompositeKernel {
-            //     pwsh,
-            //     //csharp,
-            //     fsharp,
-            // };
-            // kernel.DefaultKernelName = pwsh.Name;
+            var kernel = new CompositeKernel {
+                pwsh,
+                //csharp,
+                fsharp,
+            };
+            kernel.DefaultKernelName = pwsh.Name;
             this.kernel = kernel;
 
             Formatter.SetPreferredMimeTypeFor(typeof(object), "text/plain");
